@@ -32,7 +32,7 @@ Key points:
 
 ## Model & SDK
 
-- Model: **`claude-sonnet-4-6`** for all three features. Sonnet is the right cost/quality point; reserve Opus for post-MVP if quality demands it.
+- Model: **`claude-haiku-4-5`** for all three MVP features. The pilot runs on a free-tier budget — Haiku is the cheapest current Claude model and the three features (description, subtasks, summary) are well within its quality envelope. Upgrade to Sonnet only if a feature ships demonstrably worse output and the team agrees the cost is justified.
 - SDK: **`@anthropic-ai/sdk`** inside the Edge Function (Deno-compatible build).
 - Enable **prompt caching** on the system prompt — it changes rarely and is hit on every call.
 - Set `max_tokens` conservatively per feature (description: 600, subtasks: 400, summary: 300).
@@ -104,9 +104,15 @@ Validate every input with Zod. Reject early on bad shape.
 
 ## Cost & rate-limit hygiene
 
+The pilot runs on a free-tier budget — AI is the only line item that actually costs money. Treat tokens like cash.
+
 - Cap each feature at **5 requests per user per minute** at the Edge Function level. Return 429 on excess.
-- Log token usage per request (system + input + output) to a `ai_usage` table for visibility.
+- Hard daily cap per organization (configurable, default **100 calls/day**). Surface a friendly empty-state in the UI once hit.
+- **Prompt caching on** for the system prompt (rarely changes — cache hits are nearly free).
+- **`max_tokens` tight**: description 600, subtasks 400, summary 300. Never default-uncapped.
+- Log token usage per request (system + input + output + cached) to a small `ai_usage` table for visibility. This table is the cost meter for the pilot.
 - Do not retry on the client. One call per user action.
+- Skip streaming if the output is small enough for a single round-trip — streaming itself doesn't save tokens, but the simpler code path saves bugs.
 
 ## What this skill does NOT cover
 

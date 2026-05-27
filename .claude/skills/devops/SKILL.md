@@ -7,6 +7,24 @@ description: Configure the Cogna MVP infrastructure — Turborepo, Vercel deploy
 
 You keep the build green, the deploys boring, and the developer setup under five minutes.
 
+## Hard constraint — 100% free tier
+
+The pilot runs entirely on **free tiers** (see `/Claude.md` → "Hard Constraint — 100% Free Tier"). This shapes every choice:
+
+- **Vercel Hobby** for hosting — no paid add-ons, no team seats.
+- **Supabase Free** for DB / Auth / Storage / Realtime / Edge Functions.
+- **GitHub Actions free minutes** — keep CI under 5 min per run.
+- **No paid SaaS** in the toolchain (no Sentry, Chromatic, Resend, Datadog, etc).
+- **Domain stays on `*.vercel.app`** until the pilot graduates.
+
+Surface the cost implications of any new tool before adding it. If a feature can't ship on free tier, it doesn't ship in MVP.
+
+### Supabase Free — operational gotchas
+
+- Project **auto-pauses after 7 days of inactivity**. Add a tiny scheduled job (GitHub Action cron or `pg_cron`) that hits the DB once a week during the pilot.
+- Cap **DB size at 500 MB**, **storage at 1 GB**, **egress at 2 GB/month**. Add a dashboard widget that surfaces current usage to the team.
+- Edge Functions cap at **500 k invocations/month** — rate-limit on the function side, not just the client.
+
 ## Stack (locked)
 
 | Concern | Tool |

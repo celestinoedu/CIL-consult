@@ -64,6 +64,37 @@ The MVP should feel:
 
 ---
 
+## Hard Constraint — 100% Free Tier
+
+The pilot **must run entirely on free tiers**. This is non-negotiable for the pilot phase.
+
+### Implications per layer
+
+| Layer | Free-tier choice | Notable limit |
+|-------|------------------|---------------|
+| Hosting | **Vercel Hobby** | 100 GB bandwidth/mo, personal use |
+| DB + Auth + Storage + Realtime | **Supabase Free** | 500 MB DB, 1 GB storage, 2 GB egress, 50k MAU, pauses after 7 days idle |
+| Edge Functions | **Supabase Free** | 500 k invocations/mo |
+| Realtime | **Supabase Free** | 200 concurrent connections, 2 M messages/mo |
+| AI (when enabled) | **Claude API pay-as-you-go** | use `claude-haiku-4-5` for cheap calls, cache prompts, hard rate-limit per user |
+| Domain | none yet | use `*.vercel.app` |
+| Email | Supabase's built-in for auth | no transactional provider in MVP |
+| Monitoring | Vercel + Supabase dashboards | no Sentry/Datadog/etc. |
+
+### Engineering rules driven by this constraint
+
+- **Default to localStorage / in-memory for the prototype.** Provision Supabase only when collaboration becomes required.
+- **No paid SaaS in the toolchain.** No Chromatic, no Sentry, no LaunchDarkly, no Algolia, no Resend, no Stripe in MVP.
+- **Egress matters.** Avoid shipping large bundles, avoid hot polling, prefer realtime over interval-refetch.
+- **Storage matters.** Cap attachment size (already 25 MB) and total org storage. Surface a friendly warning at 800 MB.
+- **DB matters.** Avoid wide `jsonb` blobs, avoid storing logs in Postgres, avoid keeping per-row history we don't need.
+- **AI cost matters.** Cache the system prompt, cap output tokens, rate-limit hard (≤ 5 req/user/min). Prefer Haiku for the MVP AI features.
+- **Idle pause matters.** A Supabase free project pauses after 7 days of inactivity. Keep a tiny cron or scheduled function pinging it during the pilot window.
+
+If a feature cannot ship on free tier, it is **out of MVP scope** — even if it's listed elsewhere in this document.
+
+---
+
 ## Product Positioning
 
 Cogna should initially position itself as:
