@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 140" width="400" height="140">
+  <defs>
+    <linearGradient id="accentDark" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#34D399"/>
+      <stop offset="100%" stop-color="#0F766E"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="140" fill="#111827"/>
+  <text x="200" y="92"
+        text-anchor="middle"
+        font-family="Inter, Geist, Satoshi, system-ui, sans-serif"
+        font-size="72"
+        font-weight="700"
+        letter-spacing="-2"
+        fill="#F9FAFB">cog<tspan fill="url(#accentDark)">n</tspan>a</text>
+</svg>
